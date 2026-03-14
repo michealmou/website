@@ -293,6 +293,7 @@ a {
 .mapsvg {
     width: 100%;
     height: auto;
+    background-color: rgb(126, 208, 234);
 }
 .my-journey p{
     padding: 20px;
@@ -518,6 +519,7 @@ p {
     border: 3px solid black;
     box-shadow: 4px 4px 0px 0px #333;
     min-height: 600px;
+    background-color: rgb(126, 208, 234);
 }
 .fixed-bottom-left-image{
     position: absolute;
