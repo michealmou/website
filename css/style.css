@@ -280,147 +280,249 @@ a {
     background: #707070;
 }
 
-.world-map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: max-content;
-    height: max-content;
-    min-height: 30em;
-    background-color: #f0d7ed;
+.container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100vh;
 }
 
-svg {
+.mapsvg {
+    width: 100%;
+    height: auto;
+}
+.my-journey p{
+    padding: 20px;
+    text-align: left;
+    font-size: 18px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #0c0808;
+    box-shadow: #0c0808 0px 1px 3px;
+}
+.side-panel {
+    width: 300px;
+    background-color: white;
+    border-left: 1px solid #ddd;
+    padding: 20px;
+    overflow-y: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 10;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
+    visibility: hidden;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.side-panel.active {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Backdrop overlay when panel is open */
+.side-panel.active::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    top: 0;
     width: 100vw;
     height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+    animation: fadeInBackdrop 0.4s ease;
 }
 
-path {
-    fill: #443d4b;
-    stroke: #dcbfff;
-    transition: 100ms;
+@keyframes fadeInBackdrop {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
-path:hover {
-    fill: #dcbfff;
-    stroke: #443d4b;
+/* Smooth fade-in animation for country info */
+.country-info {
+    margin-top: 20px;
+    animation: slideInContent 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.side-panel {
-    position: fixed;
-    background-color: #1d1a20;
-    padding: 2em;
-    top: 0;
-    left: -30em;
-    width: 100%;
-    max-width: 30em;
-    height: 100vh;
-    transition: 600ms cubic-bezier(0.77, 0, 0.18, 1);
-    overflow: scroll;
-    z-index: 1;
-}
-
-.side-panel .contrainer {
-    padding-block: 2em;
-    transition: 200ms ease-out;
-}
-
-.side-panel-open {
-    left: 0;
-}
-
-.hide {
-    opacity: 0;
+@keyframes slideInContent {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .close-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 5em;
-    height: 5em;
-    border: non;
-    background-color: #443d4b;
-    color: #fff;
-    transition: 100ms;
+    float: right;
+    font-size: 24px;
+    border: none;
+    background: none;
     cursor: pointer;
-}
-
-.loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    user-select: none;
-    transition: 200ms;
-}
-
-.close-btn i {
-    font-size: 2em;
+    transition: all 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 4px;
 }
 
 .close-btn:hover {
-    background-color: #c99aff;
+    background-color: #f0f0f0;
+    transform: rotate(90deg);
 }
 
-.country-flag {
-    width: 60%;
-    max-width: 20em;
-    margin-block: 1em;
+.country-info {
+    margin-top: 20px;
 }
 
-.side-panel .container>ul>li {
-    margin-bottom: 2em;
+.country-info img {
+    width: 100%;
+    margin: 10px 0;
+    border-radius: 8px;
+    animation: scaleIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
 }
 
-.side-panel li {
-    margin-bottom: 1em;
-    font-size: 1.2em;
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.side-panel ul ul {
-    margin-top: 1em;
-    font-size: 0.7em;
-    list-style: circle;
-    padding-left: 2em;
+.country-info h2 {
+    animation: slideInText 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.side-panel strong {
-    color: #dcbfff
+.country-info p {
+    animation: slideInText 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    padding: 10px 0;
 }
 
-.zoom-controls {
-    position: fixed;
-    top: 1em;
-    right: 1em;
+.area {
+    animation-delay: 0.3s;
 }
 
-.zoom-controls button {
-    display: block;
-    width: 1.5em;
-    height: 1.5em;
-    font-size: 2em;
-    background-color: #443d4b;
-    color: #fff;
-    border: 1px #dcbfff solid;
+.capital {
+    animation-delay: 0.4s;
+}
+
+.population {
+    animation-delay: 0.5s;
+}
+
+.region {
+    animation-delay: 0.6s;
+}
+
+.description {
+    animation-delay: 0.7s;
+}
+
+@keyframes slideInText {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.controls button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.controls button:hover {
+    background-color: #f0f0f0;
+}
+
+path:hover {
+    fill: #5f5d55;
+    transition: fill 0.3s ease;
+}
+
+path {
+    transition: fill 0.3s ease;
     cursor: pointer;
 }
 
-.zoom-controls button:hover {
-    background-color: #2e2a33;
+.header {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
 }
 
-button:disabled {
-    background-color: #1d1a20;
-    border: 1px #443d4b solid;
-    cursor: default;
-    color: #333;
+p {
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
 }
 
-.zoom-out {
-    margin-bottom: 10px;
+.svg-wrapper{
+    transform-origin: center;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    width: 100%;
+    cursor: grab;
+    background-color: rgb(126, 208, 234);
+}
+
+.svg-wrapper.panning {
+    cursor: grabbing;
+    transition: none; /* Disable transition while panning for smoother experience */
+}
+
+.map-container{
+    flex: 1;
+    background-color: white;
+    overflow: hidden;
+    margin-top: 95px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /* Prevent text selection while panning */
+}
+
+.controls button{
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls button:hover{
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+.controls button:active{
+    background-color: #e0e0e0;
+    transform: scale(0.95);
 }

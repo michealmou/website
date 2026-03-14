@@ -1,96 +1,87 @@
-/*// DOM Elements
-const map = document.querySelector("svg");
+// DOM Elements
+const map = document.querySelector(".mapsvg")
 const countries = document.querySelectorAll("path");
 const sidepanel = document.querySelector(".side-panel");
 const container = document.querySelector(".side-panel .container");
 const closeBtn = document.querySelector(".close-btn");
-const zoominbtn = document.querySelector(".zoom-in");
-const zoomoutbtn = document.querySelector(".zoom-out");
-const zoomvalueoutput = document.querySelector(".zoom-value");
-const countrynameoutput = document.querySelector(".country-name");
-const countryflagoutput = document.querySelector(".country-flag");
-const briefingoutput = document.querySelector(".briefing");
-const keyachievementsoutput = document.querySelector(".key-achievement");
-const timespentoutput = document.querySelector(".time-spent");
-const skillsoutput = document.querySelector(".skills-gained");
+const zoomin = document.querySelector(".zoom-in");
+const zoomout = document.querySelector(".zoom-out");
+const countryname = document.querySelector('.country');
+const flag = document.querySelector('.flag');
+const area = document.querySelector('.area');
+const capital = document.querySelector('.capital');
+const region = document.querySelector('.region');
+const population = document.querySelector('.population');
+const description = document.querySelector('.description');
 const loading = document.querySelector(".loading");
-
-// 🌍 ADD YOUR CUSTOM DATA HERE 🌍
-// To add a new country, use the EXACT 'name' attribute from your SVG path as the key.
-const customCountryData = {
-    "Palestine": {
-        briefing: "Volunteered at local tech communities and helped build digital infrastructure for small businesses.",
-        key_achievements: "Launched 3 major websites, Hosted web development workshops",
-        time_spent: "3 months",
-        skills_gained: "Leadership, Empathy, Arabic language, Problem Solving",
-        flag_url: "./images/palestine.png"
-    },
-    "Jordan": {
-        briefing: "Studied abroad focusing on mathematics and advanced computing.",
-        key_achievements: "Won first place in the Amman university hackathon",
-        time_spent: "6 months",
-        skills_gained: "Algorithms, Team Collaboration, Advanced CSS",
-        flag_url: "https://flagcdn.com/w320/jo.png" // You can use local paths or external URLs!
-    },
-    "Canada": {
-        briefing: "Worked as a junior game developer at an indie studio.",
-        key_achievements: "Shipped a prototype in Unity, Fixed 150+ bugs",
-        time_spent: "8 months",
-        skills_gained: "C#, Unity, Physics Programming, Git",
-        flag_url: "https://flagcdn.com/w320/ca.png"
+const svgWrapper = document.querySelector(".svg-wrapper");
+// zoom variables
+let currentZoom = 1;
+const zoomStep = 0.1; //each click will zoom in/out by 10%
+const minZoom = 0.5; // Minimum zoom level
+const maxZoom = 5; // Maximum zoom level
+// Custom country data (will be populated from API)
+let customCountryData = {};
+// panning variables
+let isPanning = false;
+let panStartX = 0;
+let panStartY = 0;
+let currentPanX = 0;
+let currentPanY = 0;
+let currentpanx= 0
+let currentpany = 0;
+// Fetch all countries from REST Countries API
+async function loadCountriesData() {
+    try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        if (!response.ok) throw new Error('Failed to fetch countries');
+        
+        const countries = await response.json();
+        countries.forEach(country => {
+            customCountryData[country.cca2] = {
+                name: country.name.common,
+                flag: country.flags.png,
+                area: country.area ? (country.area.toLocaleString() + " km²") : "N/A",
+                capital: country.capital ? country.capital[0] : "N/A",
+                region: country.region,
+                population: country.population ? country.population.toLocaleString() : "N/A",
+                description: `${country.name.common} is located in ${country.region}.`
+            };
+        });
+        console.log("Countries data loaded successfully");
+    } catch (error) {
+        console.error("Error loading countries data:", error);
     }
-};
+}
 
+// Load countries data on page load
+document.addEventListener('DOMContentLoaded', loadCountriesData);
+
+// Hover Effects
 countries.forEach(country => {
     country.addEventListener("mouseenter", function () {
-        const classList = [...this.classList].join(".");
-
-        if (classList.length > 0) {
-            const selector = '.' + classList;
-            const matchingElements = document.querySelectorAll(selector);
-            matchingElements.forEach(e1 => e1.style.fill = "#c99aff");
-        } else {
-            this.style.fill = "#c99aff";
-        }
+        this.style.fill = "#c99aff";
     });
 
     country.addEventListener("mouseout", function () {
-        const classList = [...this.classList].join(".");
-
-        if (classList.length > 0) {
-            const selector = '.' + classList;
-            const matchingElements = document.querySelectorAll(selector);
-            // Revert to your SVG's base fill color
-            matchingElements.forEach(e1 => e1.style.fill = "#ececec");
-        } else {
-            this.style.fill = "#ececec";
-        }
+        this.style.fill = "#ececec";
     });
 
+    // Click event
     country.addEventListener("click", function (e) {
-        // Find the mapped country name
-        let clickedCountryName = "";
-
-        // The SVG paths use the 'name' attribute, for example: name="Palestine"
-        if (this.hasAttribute("name")) {
-            clickedCountryName = this.getAttribute("name");
-        } else if (this.classList.length > 0) {
-            clickedCountryName = this.classList[0]; // Fallback just in case
-        }
-
-        if (!clickedCountryName) return;
-
-        // UI transitions
+        const countryName = this.getAttribute("name") || this.getAttribute("class");
+        
+        // Show loading state
         if (loading) loading.innerText = "Loading...";
         if (container) container.classList.add("hide");
         if (loading) loading.classList.remove("hide");
-        if (sidepanel) sidepanel.classList.add("side-panel-open");
+        if (sidepanel) sidepanel.classList.add("active");
 
-        // Grab your custom country data
-        const countryInfo = customCountryData[clickedCountryName];
+        // Get custom data
+        const countryData = customCountryData[countryName];
 
-        // Fetch data from REST Countries API to dynamically pull the flag
-        fetch(`https://restcountries.com/v3.1/name/${clickedCountryName}?fullText=true`)
+        // Fetch from REST Countries API
+        fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
             .then(response => {
                 if (!response.ok) return null;
                 return response.json();
@@ -99,43 +90,25 @@ countries.forEach(country => {
                 setTimeout(() => {
                     const apiData = data ? data[0] : null;
 
-                    // Name (Fallback to SVG name if API fails)
-                    if (countrynameoutput) {
-                        countrynameoutput.innerText = apiData ? apiData.name.common : clickedCountryName;
-                    }
-
-                    // Flag priority: Custom Data -> API Data -> Nothing
-                    if (countryflagoutput) {
-                        const flagUrl = (countryInfo && countryInfo.flag_url)
-                            ? countryInfo.flag_url
-                            : (apiData ? apiData.flags.png : "");
-
+                    if (countryname) countryname.innerText = countryData ? countryData.name : (apiData ? apiData.name.common : countryName);
+                    if (area) area.innerText = `Area: ${countryData ? countryData.area : (apiData ? apiData.area + " km²" : "N/A")}`;
+                    if (capital) capital.innerText = `Capital: ${countryData ? countryData.capital : (apiData && apiData.capital ? apiData.capital[0] : "N/A")}`;
+                    if (population) population.innerText = `Population: ${countryData ? countryData.population : (apiData ? apiData.population.toLocaleString() : "N/A")}`;
+                    if (region) region.innerText = `Region: ${countryData ? countryData.region : (apiData ? apiData.region : "N/A")}`;
+                    if (description) description.innerText = countryData ? countryData.description : (apiData ? `${apiData.name.common} is located in ${apiData.region}.` : "N/A");
+                    
+                    if (flag) {
+                        const flagUrl = (countryData && countryData.flag) ? countryData.flag : (apiData ? apiData.flags.png : "");
                         if (flagUrl) {
-                            countryflagoutput.src = flagUrl;
-                            countryflagoutput.style.display = "block";
-                        } else {
-                            countryflagoutput.style.display = "none";
+                            flag.src = flagUrl;
+                            flag.style.display = "block";
                         }
                     }
 
-                    if (countryInfo) {
-                        // Display your custom text if it exists
-                        if (briefingoutput) briefingoutput.innerText = countryInfo.briefing || "N/A";
-                        if (keyachievementsoutput) keyachievementsoutput.innerText = countryInfo.key_achievements || "N/A";
-                        if (timespentoutput) timespentoutput.innerText = countryInfo.time_spent || "N/A";
-                        if (skillsoutput) skillsoutput.innerText = countryInfo.skills_gained || "N/A";
-                    } else {
-                        // When they click a new country without custom data yet
-                        if (briefingoutput) briefingoutput.innerText = "Wow! Uncharted territory. No journey data added here yet.";
-                        if (keyachievementsoutput) keyachievementsoutput.innerText = "To be determined...";
-                        if (timespentoutput) timespentoutput.innerText = "0 days (so far!)";
-                        if (skillsoutput) skillsoutput.innerText = "Wanderlust";
-                    }
-
-                    // Hide loading and show container
+                    // Hide loading and show content
                     if (loading) loading.classList.add("hide");
                     if (container) container.classList.remove("hide");
-                }, 400); // UI delay for feel
+                }, 400);
             })
             .catch(error => {
                 console.error("Fetch Error:", error);
@@ -144,8 +117,104 @@ countries.forEach(country => {
     });
 });
 
+// Close side panel
 if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-        sidepanel.classList.remove("side-panel-open");
+    closeBtn.addEventListener("click", function () {
+        sidepanel.classList.remove("active");
     });
 }
+
+// Close panel when clicking on map background
+if (map) {
+    map.addEventListener("click", function (event) {
+        if (event.target === map) {
+            sidepanel.classList.remove("active");
+        }
+    });
+}
+
+// Zoom controls
+function handleZoomIn() {
+    if (currentZoom < maxZoom) {
+        currentZoom += zoomStep;
+        applyZoom();
+    }
+}
+
+function handleZoomOut() {
+    if (currentZoom > minZoom) {
+        currentZoom -= zoomStep;
+        applyZoom();
+
+        // Reset pan when zooming out completely
+        if (currentZoom <= 1) {
+            currentZoom = 1; // Ensure it doesn't go below 1
+            resetPan();
+            applyZoom();
+        }
+    }
+}
+
+function applyZoom() {
+    if (svgWrapper) {
+        svgWrapper.style.transform = `translate(${currentPanX}px, ${currentPanY}px) scale(${currentZoom})`;
+    }
+}
+// start panning
+function startPanning(e) {
+    // Only start panning if the click is on the SVG wrapper (not on controls or side panel)
+    if (e.target.tagName === 'path'){
+        return;
+    }
+    // only pan if zoomed in 
+    if (currentZoom <= 1) {
+        return;
+    }
+    isPanning = true;
+    panStartX = e.clientX - currentPanX;
+    panStartY = e.clientY - currentPanY;
+    // add visual feedback for panning
+    if (svgWrapper) {
+        svgWrapper.classList.add("panning");
+    }
+}
+
+// pan during drag (mouse move)
+
+function pan(e) {
+    if (!isPanning) return;
+    currentPanX = e.clientX - panStartX;
+    currentPanY = e.clientY - panStartY;    
+    //apply pan without transtion for smooth dragging
+    if (svgWrapper) {
+        svgWrapper.style.transform = `translate(${currentPanX}px, ${currentPanY}px) scale(${currentZoom})`;
+    }
+}
+// stop panning
+function stopPanning() {
+    isPanning = false;
+    // remove panning class to restore cursor and transition
+    if (svgWrapper) {
+        svgWrapper.classList.remove("panning");
+    }
+}
+// reset pan whening zooming out completely
+function resetPan() {
+    currentPanX = 0;
+    currentPanY = 0;
+}
+
+if (zoomin) {
+    zoomin.addEventListener("click", handleZoomIn);
+}
+if (zoomout) {
+    zoomout.addEventListener("click", handleZoomOut);
+}
+// pan controls - attach event listeners
+
+if (map){
+    map.addEventListener("mousedown", startPanning);
+    map.addEventListener("mousemove", pan);
+    map.addEventListener("mouseup", stopPanning);
+}
+//reset pan when zoom restuns to 1x
