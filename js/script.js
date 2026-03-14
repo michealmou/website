@@ -218,3 +218,20 @@ if (map){
     map.addEventListener("mouseup", stopPanning);
 }
 //reset pan when zoom restuns to 1x
+
+//add wheel event for zooming with mouse wheel
+function handleWheelZoom(e) {
+    e.preventDefault(); //stop page from scrolling
+    // deltay is negative when scrolling up (zoom in) and positive when scrolling down (zoom out)
+    if (e.deltaY < 0) {
+        //scroll up - zoom in
+        handleZoomIn();
+    } else if (e.deltaY > 0) {
+        //scroll down - zoom out
+        handleZoomOut();
+    }
+}
+// attach wheel event to svg wrapper 
+if (svgWrapper) {
+    svgWrapper.addEventListener("wheel", handleWheelZoom, {passive: false});
+}
