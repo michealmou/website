@@ -15,13 +15,36 @@ const population = document.querySelector('.population');
 const description = document.querySelector('.description');
 const loading = document.querySelector(".loading");
 const svgWrapper = document.querySelector(".svg-wrapper");
+const achievementsList = document.querySelector('.achievements-list');
+const timeSpentSpan = document.querySelector('.time-spent span');
+const instructionsDiv = document.querySelector('.instructions');
+const countryInfoDiv = document.querySelector('.country-info');
 // zoom variables
 let currentZoom = 1;
 const zoomStep = 0.1; //each click will zoom in/out by 10%
 const minZoom = 0.5; // Minimum zoom level
-const maxZoom = 5; // Maximum zoom level
+const maxZoom = 7; // Maximum zoom level
 // Custom country data (will be populated from API)
-let customCountryData = {};
+const customCountryData = {
+    'PS': {
+        achievements: [
+            'Background: Palestinian (born and raised in Palestine)',
+            'Graduated High School with a 90.1% Average',
+            'Collaborated and built connections with diverse individuals',
+            'Gained hands-on experience in high-pressure work environments.',
+        ],
+        timespent: 'Spent my early life (0–18) in Palestine.'
+    },
+    'Cyprus': {
+        achievements: [
+            'B.Sc. in Mathematics and Computer Science',
+            'High Honors and Honors in first two semesters',
+            'Relocated internationally to pursue higher education.',
+            'Built a strong foundation in programming through self-driven learning and projects.'
+        ],
+        timespent: '4 years'
+    }
+};
 // panning variables
 let isPanning = false;
 let panStartX = 0;
@@ -38,7 +61,7 @@ async function loadCountriesData() {
         
         const countries = await response.json();
         countries.forEach(country => {
-            customCountryData[country.cca2] = {
+            countrydata[country.cca2] = {
                 name: country.name.common,
                 flag: country.flags.png,
                 area: country.area ? (country.area.toLocaleString() + " km²") : "N/A",
@@ -58,7 +81,7 @@ async function loadCountriesData() {
 document.addEventListener('DOMContentLoaded', loadCountriesData);
 
 // Hover Effects
-countries.forEach(country => {
+countries.forEach(function(country) {
     country.addEventListener("mouseenter", function () {
         this.style.fill = "#c99aff";
     });
@@ -70,47 +93,86 @@ countries.forEach(country => {
     // Click event
     country.addEventListener("click", function (e) {
         const countryName = this.getAttribute("name") || this.getAttribute("class");
+        const countryId = this.getAttribute("id");
         
         // Show loading state
-        if (loading) loading.innerText = "Loading...";
-        if (container) container.classList.add("hide");
+        if (instructionsDiv) instructionsDiv.classList.add("hide");
+        if (countryInfoDiv) countryInfoDiv.classList.remove("hide");
         if (loading) loading.classList.remove("hide");
         if (sidepanel) sidepanel.classList.add("active");
 
-        // Get custom data
-        const countryData = customCountryData[countryName];
+        // Get custom data - try by ISO code first, then by name
+        const customData = customCountryData[countryId] || customCountryData[countryName];
 
         // Fetch from REST Countries API
         fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
-            .then(response => {
+            .then(function(response) {
                 if (!response.ok) return null;
                 return response.json();
             })
-            .then(data => {
-                setTimeout(() => {
+            .then(function(data) {
+                setTimeout(function() {
                     const apiData = data ? data[0] : null;
 
-                    if (countryname) countryname.innerText = countryData ? countryData.name : (apiData ? apiData.name.common : countryName);
-                    if (area) area.innerText = `Area: ${countryData ? countryData.area : (apiData ? apiData.area + " km²" : "N/A")}`;
-                    if (capital) capital.innerText = `Capital: ${countryData ? countryData.capital : (apiData && apiData.capital ? apiData.capital[0] : "N/A")}`;
-                    if (population) population.innerText = `Population: ${countryData ? countryData.population : (apiData ? apiData.population.toLocaleString() : "N/A")}`;
-                    if (region) region.innerText = `Region: ${countryData ? countryData.region : (apiData ? apiData.region : "N/A")}`;
-                    if (description) description.innerText = countryData ? countryData.description : (apiData ? `${apiData.name.common} is located in ${apiData.region}.` : "N/A");
+                    // Name
+                    if (countryname) countryname.innerText = customData ? customData.name || countryName : (apiData ? apiData.name.common : countryName);
                     
+                    // Area
+                    if (area) area.innerText = `Area: ${customData && customData.area ? customData.area : (apiData ? apiData.area.toLocaleString() + " km²" : "N/A")}`;
+                    
+                    // Capital
+                    if (capital) capital.innerText = `Capital: ${customData && customData.capital ? customData.capital : (apiData && apiData.capital ? apiData.capital[0] : "N/A")}`;
+                    
+                    // Region
+                    if (region) region.innerText = `Region: ${customData && customData.region ? customData.region : (apiData ? apiData.region : "N/A")}`;
+                    
+                    // Population
+                    if (population) population.innerText = `Population: ${customData && customData.population ? customData.population : (apiData ? apiData.population.toLocaleString() : "N/A")}`;
+                    
+                    // Description
+                    if (description) description.innerText = customData && customData.personalNotes ? customData.personalNotes : (apiData ? `${apiData.name.common} is located in ${apiData.region}.` : "N/A");
+                    
+                    // Flag - always use API
                     if (flag) {
-                        const flagUrl = (countryData && countryData.flag) ? countryData.flag : (apiData ? apiData.flags.png : "");
+                        const flagUrl = customData && customData.flag ? customData.flag : (apiData ? apiData.flags.png : "");
                         if (flagUrl) {
                             flag.src = flagUrl;
                             flag.style.display = "block";
+                        }
+                    }
+                    
+                    // Achievements
+                    if (achievementsList) {
+                        achievementsList.innerHTML = "";
+                        if (customData && customData.achievements && Array.isArray(customData.achievements)) {
+                            customData.achievements.forEach(achievement => {
+                                const li = document.createElement('li');
+                                li.innerText = achievement;
+                                achievementsList.appendChild(li);
+                            });
+                        } else {
+                            achievementsList.innerHTML = "<li>No achievements data available.</li>";
+                        }
+                    }
+                    
+                    // Time Spent
+                    if (timeSpentSpan) {
+                        if (customData && customData.timespent) {
+                            timeSpentSpan.textContent = customData.timespent;
+                        } else {
+                            timeSpentSpan.textContent = "N/A";
                         }
                     }
 
                     // Hide loading and show content
                     if (loading) loading.classList.add("hide");
                     if (container) container.classList.remove("hide");
+                    
+                    // Show close button
+                    if (closeBtn) closeBtn.classList.remove("hide");
                 }, 400);
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error("Fetch Error:", error);
                 if (loading) loading.innerText = "Failed to load country details.";
             });
@@ -120,7 +182,17 @@ countries.forEach(country => {
 // Close side panel
 if (closeBtn) {
     closeBtn.addEventListener("click", function () {
-        sidepanel.classList.remove("active");
+        if (sidepanel) {
+            sidepanel.classList.add("closing");
+            // Wait for animation to complete before hiding
+            setTimeout(function() {
+                sidepanel.classList.remove("active");
+                sidepanel.classList.remove("closing");
+                if (countryInfoDiv) countryInfoDiv.classList.add("hide");
+                if (instructionsDiv) instructionsDiv.classList.remove("hide");
+                if (closeBtn) closeBtn.classList.add("hide");
+            }, 400);
+        }
     });
 }
 
@@ -128,7 +200,13 @@ if (closeBtn) {
 if (map) {
     map.addEventListener("click", function (event) {
         if (event.target === map) {
-            sidepanel.classList.remove("active");
+            sidepanel.classList.add("closing");
+            // Wait for animation to complete before removing active
+            setTimeout(function() {
+                sidepanel.classList.remove("active");
+                sidepanel.classList.remove("closing");
+                if (closeBtn) closeBtn.classList.add("hide");
+            }, 400);
         }
     });
 }
