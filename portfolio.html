@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio</title>
+<style>
+  :root{
+    --yellow:#FFD23F;
+    --yellow-deep:#F5B700;
+    --ink:#101014;
+    --teal:#5FD9C7;
+    --pink:#FF7AA2;
+    --paper:#FFFDF7;
+    --line:3px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+  }
+
+  h1,h2,h3{font-family:'Segoe UI', system-ui, sans-serif; font-weight:800; margin:0;}
+
+  .dotgrid{
+    background-image: radial-gradient(var(--ink) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-color: var(--paper);
+    opacity: 0.06;
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px;
+    background:var(--yellow);
+    border-bottom: var(--line) solid var(--ink);
+  }
+  .logo{
+    width:40px; height:40px; border:3px solid var(--ink); border-radius:8px;
+    background:var(--teal); display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:14px;
+  }
+  .navlinks{display:flex; gap:22px; align-items:center; font-weight:700; font-size:14px;}
+  .navlinks a{color:var(--ink); text-decoration:none;}
+  .pill-btn{
+    background:var(--teal); border:2.5px solid var(--ink); border-radius:8px;
+    padding:8px 16px; font-weight:800; font-size:13px; cursor:pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--yellow);
+    padding: 60px 28px 90px;
+    position:relative;
+    overflow:hidden;
+  }
+  .badge-icon{
+    position:absolute; border:3px solid var(--ink); border-radius:10px;
+    background:var(--teal); width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:16px;
+  }
+  .hero-inner{
+    max-width:760px; margin:0 auto; text-align:center; position:relative; z-index:2;
+  }
+  .wave{font-size:15px; color:#3a3a3a; font-weight:700;}
+  .hero h1{font-size:clamp(28px,5vw,44px); margin:10px 0 14px;}
+  .hero p{max-width:520px; margin:0 auto 24px; line-height:1.5; font-size:15px; color:#333;}
+  .hero-ctas{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:26px;}
+  .btn-primary{
+    background:var(--teal); border:3px solid var(--ink); border-radius:10px;
+    padding:12px 24px; font-weight:800; box-shadow:4px 4px 0 var(--ink);
+    cursor:pointer; font-size:14px;
+  }
+  .btn-ghost{
+    background:transparent; border:2px dashed var(--ink); border-radius:10px;
+    padding:12px 20px; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  .stack{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  .chip{
+    border:2.5px solid var(--ink); border-radius:8px; padding:6px 12px;
+    background:#fff; font-size:12px; font-weight:700;
+  }
+
+  /* torn paper divider */
+  .torn{
+    width:100%; height:36px; display:block; margin-top:-1px;
+  }
+
+  /* ---------- SECTION SHELL ---------- */
+  section.block{
+    max-width:920px; margin:0 auto; padding:50px 24px; position:relative;
+  }
+  .label{
+    display:inline-block; background:var(--yellow); border:3px solid var(--ink);
+    border-radius:8px; padding:8px 18px; font-weight:900; font-size:14px;
+    box-shadow:3px 3px 0 var(--ink); margin-bottom:22px;
+  }
+  .card-outline{
+    border:3px solid var(--ink); border-radius:14px; padding:22px; background:#fff;
+  }
+  .hl{padding:2px 6px; border-radius:4px; font-weight:700;}
+  .hl.yellow{background:var(--yellow);}
+  .hl.teal{background:var(--teal);}
+  .hl.pink{background:var(--pink);}
+
+  /* ---------- JOURNEY ---------- */
+  .journey-wrap{
+    display:grid; grid-template-columns: 1fr 1.4fr; gap:0;
+    border:3px solid var(--ink); border-radius:14px; overflow:hidden;
+  }
+  .journey-list{padding:18px; background:#fff; font-size:13px;}
+  .journey-list h4{margin:0 0 4px; font-size:14px;}
+  .journey-list .role{margin-bottom:16px;}
+  .journey-list .meta{color:#777; font-size:11px; margin-bottom:4px;}
+  .journey-map{
+    background:linear-gradient(135deg,#e8c9a3,#bfe3d8);
+    position:relative; min-height:260px;
+  }
+  .pin{
+    position:absolute; background:var(--yellow); border:2px solid var(--ink);
+    border-radius:6px; padding:3px 8px; font-size:10px; font-weight:800;
+  }
+  @media (max-width:640px){
+    .journey-wrap{grid-template-columns:1fr;}
+  }
+
+  /* ---------- SKILLS GRID ---------- */
+  .skills-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+  }
+  @media (max-width:700px){ .skills-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:460px){ .skills-grid{grid-template-columns:1fr;} }
+  .skill-card{border:3px solid var(--ink); border-radius:12px; padding:14px; background:#fff;}
+  .skill-card h4{font-size:13px; margin-bottom:10px; display:flex; align-items:center; gap:6px;}
+  .skill-tags{display:flex; flex-wrap:wrap; gap:6px;}
+  .tag{border:2px solid var(--ink); border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700;}
+
+  /* ---------- SIDE PROJECT ---------- */
+  .side-project{
+    text-align:center; padding:40px 0;
+  }
+  .side-project .eyebrow{font-size:12px; font-style:italic; color:#777; margin-bottom:10px;}
+  .project-badge{
+    display:inline-block; background:var(--yellow); border:3px solid var(--ink); border-radius:10px;
+    padding:14px 28px; font-weight:900; font-size:20px; box-shadow:4px 4px 0 var(--ink);
+  }
+
+  /* ---------- CONTACT ---------- */
+  .contact{
+    text-align:center; padding:60px 24px;
+  }
+  .contact h2{font-size:22px; margin-bottom:26px;}
+  .social-row{display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+  .social-card{
+    width:100px; height:100px; border:3px solid var(--ink); border-radius:14px;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px;
+    cursor:pointer; transition:transform .15s;
+  }
+  .social-card:hover{transform:translateY(-4px);}
+  .social-card.li{background:var(--teal);}
+  .social-card.gh{background:var(--yellow);}
+  .social-card.coffee{background:var(--pink);}
+
+  /* reveal animation */
+  .reveal{
+    opacity:0; transform:translateY(28px);
+    transition: opacity .6s ease, transform .6s ease, clip-path .6s ease;
+    clip-path: polygon(0 8%, 100% 0%, 100% 92%, 0% 100%);
+  }
+  .reveal.in{
+    opacity:1; transform:translateY(0);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="logo">YN</div>
+  </div>
+  <div class="navlinks">
+    <a href="#about">About</a>
+    <a href="#journey">Journey</a>
+    <a href="#skills">Skills</a>
+  </div>
+  <button class="pill-btn">Get in Touch!</button>
+</nav>
+
+<header class="hero">
+  <div class="badge-icon" style="top:70px; left:6%;">&lt;/&gt;</div>
+  <div class="badge-icon" style="top:90px; right:6%;">&gt;_</div>
+  <div class="badge-icon" style="bottom:40px; left:10%;">💾</div>
+  <div class="hero-inner">
+    <div class="wave">Hi there! 👋</div>
+    <h1>I'm Your Name.</h1>
+    <p>Based in [City, Country], I'm a Software Engineer. I love working with distributed systems, data pipelines, and cloud technologies, and I'm passionate about full-stack development and building cool stuff.</p>
+    <div class="hero-ctas">
+      <button class="btn-primary">Get in Touch!</button>
+      <button class="btn-ghost">☕ Buy me a coffee</button>
+    </div>
+    <div class="stack">
+      <span class="chip">Node.js</span>
+      <span class="chip">React</span>
+      <span class="chip">Python</span>
+      <span class="chip">JavaScript</span>
+      <span class="chip">HTML</span>
+      <span class="chip">TypeScript</span>
+      <span class="chip">Google Cloud</span>
+      <span class="chip">Docker</span>
+    </div>
+  </div>
+  <svg class="torn" viewBox="0 0 720 24" preserveAspectRatio="none">
+    <polygon points="0,24 0,10 20,16 40,6 60,14 80,4 100,12 120,6 140,16 160,8 180,14 200,4 220,12 240,6 260,16 280,8 300,14 320,4 340,12 360,6 380,16 400,8 420,14 440,4 460,12 480,6 500,16 520,8 540,14 560,4 580,12 600,6 620,16 640,8 660,14 680,4 700,12 720,8 720,24" fill="#FFFDF7"/>
+  </svg>
+</header>
+
+<div style="position:relative;">
+<div class="dotgrid"></div>
+
+<section class="block reveal" id="about">
+  <span class="label">ABOUT</span>
+  <div class="card-outline">
+    <p style="line-height:1.7; font-size:14px;">
+      Highly experienced and dynamic software engineer with a rich professional background spanning over
+      <span class="hl yellow">X years</span>. Throughout my career, I've held positions across
+      <span class="hl pink">multiple countries and companies</span>, with contributions pivotal in designing and
+      constructing <span class="hl teal">microservices for distributed systems</span>, implementing
+      <span class="hl teal">data pipelines on the cloud</span>, and engaging in
+      <span class="hl yellow">full-stack development</span>.
+    </p>
+    <p style="line-height:1.7; font-size:14px;">
+      My passion for <span class="hl teal">continuous learning and innovation</span> is evident through my active
+      presence on various platforms. I thrive on staying updated with the
+      <span class="hl pink">latest trends and technologies</span> in the ever-evolving tech landscape.
+    </p>
+    <p style="line-height:1.7; font-size:14px;">
+      I bring a unique blend of <span class="hl yellow">technical expertise</span>,
+      <span class="hl yellow">leadership qualities</span>, and a genuine enthusiasm for creating
+      <span class="hl teal">impactful software solutions</span>.
+    </p>
+  </div>
+</section>
+
+<section class="block reveal" id="journey">
+  <span class="label">MY JOURNEY</span>
+  <div class="journey-wrap">
+    <div class="journey-list">
+      <div class="role">
+        <h4>Senior Software Engineer @ Company A</h4>
+        <div class="meta">2022 — Present · Remote</div>
+        Led development of cloud-native systems, designed microservices for distributed data pipelines.
+      </div>
+      <div class="role">
+        <h4>Software Engineer @ Company B</h4>
+        <div class="meta">2019 — 2022 · City, Country</div>
+        Built full-stack features end to end, owned CI/CD, mentored junior engineers.
+      </div>
+      <div class="role">
+        <h4>Software Engineer @ Company C</h4>
+        <div class="meta">2016 — 2019 · City, Country</div>
+        Developed core platform features and integrations for enterprise clients.
+      </div>
+    </div>
+    <div class="journey-map">
+      <div class="pin" style="top:20%; left:40%;">HOME</div>
+      <div class="pin" style="top:50%; left:65%;">WORK</div>
+      <div class="pin" style="top:70%; left:30%;">STUDY</div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="skills">
+  <span class="label">SKILLS</span>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <h4>⚛️ Frontend</h4>
+      <div class="skill-tags">
+        <span class="tag">React.js</span><span class="tag">Redux</span>
+        <span class="tag">MobX</span><span class="tag">Angular</span>
+        <span class="tag">Bootstrap</span><span class="tag">Material UI</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <h4>&lt;/&gt; Languages</h4>
+      <div class="skill-tags">
+        <span class="tag">JavaScript</span><span class="tag">TypeScript</span>
+        <span class="tag">Python</span><span class="tag">Java</span>
+        <span class="tag">Kotlin</span><span class="tag">SQL</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <h4>🟢 Backend</h4>
+      <div class="skill-tags">
+        <span class="tag">Node.js</span><span class="tag">Express.js</span>
+        <span class="tag">Firebase</span><span class="tag">Cloud Functions</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <h4>☁️ Cloud & DevOps</h4>
+      <div class="skill-tags">
+        <span class="tag">Google Cloud</span><span class="tag">AWS</span>
+        <span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">Terraform</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <h4>🗄️ Databases</h4>
+      <div class="skill-tags">
+        <span class="tag">MongoDB</span><span class="tag">Firestore</span>
+        <span class="tag">PostgreSQL</span><span class="tag">Redis</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <h4>🛠️ Tools & More</h4>
+      <div class="skill-tags">
+        <span class="tag">Git</span><span class="tag">GraphQL</span>
+        <span class="tag">Jest</span><span class="tag">Jira</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal">
+  <div class="skills-grid" style="grid-template-columns:1fr 1fr;">
+    <div class="skill-card" style="background:var(--yellow);">
+      <h4>🏗️ Architecture</h4>
+      <div class="skill-tags">
+        <span class="tag">Microservices</span><span class="tag">SaaS</span><span class="tag">Pub/Sub</span>
+      </div>
+    </div>
+    <div class="skill-card" style="background:var(--yellow);">
+      <h4>👥 Methodologies</h4>
+      <div class="skill-tags">
+        <span class="tag">Agile</span><span class="tag">Scrum</span><span class="tag">CI/CD</span><span class="tag">TDD</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block side-project reveal">
+  <div class="eyebrow">Creator of</div>
+  <div class="project-badge">🔥 SideProject</div>
+  <p style="margin-top:10px; font-size:13px; color:#666;">A CLI tool for lazy developers. Built with Go.</p>
+  <br>
+  <button class="btn-ghost" style="margin-top:10px;">🔗 Check it out</button>
+</section>
+
+<section class="block reveal">
+  <div class="skills-grid" style="grid-template-columns:1fr 1fr;">
+    <div>
+      <span class="label">EDUCATION</span>
+      <div class="card-outline">
+        <strong>Bachelor's Degree in Computer Science</strong>
+        <div style="color:#777; font-size:13px; margin:4px 0;">University Name</div>
+        <span class="tag" style="background:var(--teal);">20XX – 20XX</span>
+      </div>
+    </div>
+    <div>
+      <span class="label">LANGUAGES</span>
+      <div class="card-outline">
+        <div class="tag" style="display:block; margin-bottom:8px;">English</div>
+        <div class="tag" style="display:block; margin-bottom:8px;">Native language</div>
+        <div class="tag" style="display:block;">Another language</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact reveal">
+  <span class="label">GET IN TOUCH</span>
+  <h2>Let's build something amazing together</h2>
+  <div class="social-row">
+    <div class="social-card li">in</div>
+    <div class="social-card gh">GH</div>
+    <div class="social-card coffee">☕</div>
+  </div>
+</section>
+
+</div>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, {threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>

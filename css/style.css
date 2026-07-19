@@ -1,6 +1,70 @@
 /* Start styling here */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: #bcbcbc;
+    color: #111;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+body.dark-mode .main_border {
+    background-color: #1f2937;
+    border-color: #f9fafb;
+    box-shadow: 4px 4px 0px 0px #6b7280;
+}
+
+body.dark-mode .nav,
+body.dark-mode .nav_in,
+body.dark-mode .languagebutton,
+body.dark-mode .instructions,
+body.dark-mode .side-panel,
+body.dark-mode .country-info,
+body.dark-mode .map-container {
+    border-color: #f9fafb;
+    box-shadow: 4px 4px 0px 0px #6b7280;
+}
+
+body.dark-mode .nav {
+    background: #111827;
+    color: #f9fafb;
+}
+
+body.dark-mode .nav_in {
+    background-color: #2563eb;
+    color: #f9fafb;
+}
+
+body.dark-mode .languagebutton,
+body.dark-mode .instructions,
+body.dark-mode .side-panel,
+body.dark-mode .country-info,
+body.dark-mode .map-container {
+    background-color: #374151;
+    color: #f9fafb;
+}
+
+body.dark-mode .aboutmeparagraph,
+body.dark-mode .container {
+    color: #f9fafb;
+}
+
+body.dark-mode .close-btn {
+    color: #f9fafb;
+}
+
+body.dark-mode .mapsvg {
+    background-color: #1d4ed8;
+}
+
+[id] {
+    scroll-margin-top: 100px;
 }
 
 .main_border {
@@ -28,6 +92,9 @@ body {
     padding: 20px;
     background: #f2d200;
     height: 25px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .nav_in {
@@ -41,8 +108,13 @@ body {
     border-color: black;
     background-color: #47b9fb;
     height: 45px;
+    color: black;
+
 }
 
+.middle {
+    margin-left: 30%;
+}
 
 .left {
     text-align: right;
@@ -85,6 +157,13 @@ a {
     margin-top: 15px;
     margin-bottom: 15px;
     display: inline-flex;
+    color: inherit;
+    text-decoration: none;
+}
+
+.nav_in2 a:hover,
+.nav a:hover {
+    text-decoration: underline;
 }
 
 .nav-right {
@@ -228,20 +307,82 @@ a {
 }
 
 .journey {
-    background: #ffffff;
+    background: #f2d200;
     margin-left: 25px;
-    margin-right: 25px;
     margin-top: 85px;
+    margin-bottom: 25px;
+    width: 200px;
+    font-size: 25px;
+    text-align: center;
+    padding: 8px 0;
+    border: 3px solid black;
+    box-shadow: 4px 4px 0px #333;
+    border-radius: 5px;
+    font-weight: bold;
+    font-style: normal;
+    w
+}
+
+.skills {
+    background: #f2d200;
+    margin-left: 25px;
+    margin-top: 85px;
+    margin-bottom: 25px;
     width: 100px;
     font-size: 25px;
     text-align: center;
     padding: 8px 0;
     border: 3px solid black;
     box-shadow: 4px 4px 0px #333;
-    border-radius: 2px;
+    border-radius: 5px;
     font-weight: bold;
     font-style: normal;
-    width: auto;
+}
+
+.skillsTBL {
+    display: flex;
+
+}
+
+.skillscells {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    padding: 25px;
+    font-family: "sumfont", sans-serif;
+    font-style: normal;
+    border: 3px solid black;
+    box-shadow: 4px 4px 0px #333;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.skillscells div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skillscell {
+    margin: 0;
+    padding: 4px 8px;
+    font-family: "sumfont", sans-serif;
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    background: #ffffff;
+    border: 2px solid black;
+    border-radius: 6px;
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
 }
 
 .contain {
@@ -295,7 +436,8 @@ a {
     height: auto;
     background-color: rgb(126, 208, 234);
 }
-.my-journey p{
+
+.my-journey p {
     padding: 20px;
     text-align: left;
     font-size: 18px;
@@ -303,6 +445,7 @@ a {
     border-bottom: 1px solid #0c0808;
     box-shadow: #0c0808 0px 1px 3px;
 }
+
 .side-panel {
     width: 280px;
     background-color: white;
@@ -335,6 +478,7 @@ a {
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
@@ -345,6 +489,7 @@ a {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -361,6 +506,7 @@ a {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -381,29 +527,35 @@ a {
     display: flex;
     justify-content: center;
 }
+
 .instructions {
     padding: 10px;
     background: #47b9fb;
     border: 3px solid black;
     box-shadow: 4px 4px 0px #333;
 }
+
 .close-btn:hover {
     background-color: #f0f0f0;
 }
+
 .hide {
     display: none;
-    
+
 }
-@keyframes slideIn{
+
+@keyframes slideIn {
     from {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+
 .country-info {
     margin-top: 20px;
 }
@@ -420,6 +572,7 @@ a {
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -460,6 +613,7 @@ a {
         opacity: 0;
         transform: translateX(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -512,7 +666,8 @@ path {
 .heart-crosshair {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
     opacity: 0.5;
-    pointer-events: none; /* Allow clicks to pass through the marker */
+    pointer-events: none;
+    /* Allow clicks to pass through the marker */
 }
 
 .header {
@@ -528,7 +683,7 @@ p {
     font-size: 18px;
 }
 
-.svg-wrapper{
+.svg-wrapper {
     transform-origin: center;
     transition: transform 0.3s ease;
     display: inline-block;
@@ -539,10 +694,11 @@ p {
 
 .svg-wrapper.panning {
     cursor: grabbing;
-    transition: none; /* Disable transition while panning for smoother experience */
+    transition: none;
+    /* Disable transition while panning for smoother experience */
 }
 
-.map-container{
+.map-container {
     position: relative;
     flex: 1;
     background-color: white;
@@ -550,17 +706,19 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none; /* Prevent text selection while panning */
+    user-select: none;
+    /* Prevent text selection while panning */
     border: 3px solid black;
     box-shadow: 4px 4px 0px 0px #333;
     min-height: 600px;
     background-color: rgb(126, 208, 234);
 }
-.fixed-bottom-left-image{
+
+.fixed-bottom-left-image {
     position: absolute;
     bottom: 180px;
     left: 20px;
-    width: 150px; 
+    width: 150px;
     height: auto;
     z-index: 50;
     pointer-events: none;
@@ -571,6 +729,6 @@ p {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
     opacity: 1;
     pointer-events: none;
-    width: auto; 
+    width: auto;
     height: auto;
 }

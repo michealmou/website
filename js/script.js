@@ -19,14 +19,17 @@ const achievementsList = document.querySelector('.achievements-list');
 const timeSpentSpan = document.querySelector('.time-spent span');
 const instructionsDiv = document.querySelector('.instructions');
 const countryInfoDiv = document.querySelector('.country-info');
+const themeToggle = document.getElementById('theme-toggle');
 // zoom variables
 let currentZoom = 1;
 const zoomStep = 0.1; //each click will zoom in/out by 10%
 const minZoom = 0.5; // Minimum zoom level
 const maxZoom = 7; // Maximum zoom level
-// Custom country data (will be populated from API)
+// Custom country data for the journey map
 const customCountryData = {
     'PS': {
+        name: 'Palestine',
+        flag: 'assets/images/palestine.png',
         achievements: [
             'Background: Palestinian (born and raised in Palestine)',
             'Graduated High School with a 90.1% Average',
@@ -35,7 +38,20 @@ const customCountryData = {
         ],
         timespent: 'Spent my early life (0–18) in Palestine.'
     },
+    'CY': {
+        name: 'Cyprus',
+        flag: 'https://flagcdn.com/w320/cy.png',
+        achievements: [
+            'B.Sc. in Mathematics and Computer Science',
+            'High Honors and Honors in first two semesters',
+            'Relocated internationally to pursue higher education.',
+            'Built a strong foundation in programming through self-driven learning and projects.'
+        ],
+        timespent: '4 years'
+    },
     'Cyprus': {
+        name: 'Cyprus',
+        flag: 'https://flagcdn.com/w320/cy.png',
         achievements: [
             'B.Sc. in Mathematics and Computer Science',
             'High Honors and Honors in first two semesters',
@@ -53,32 +69,15 @@ let currentPanX = 0;
 let currentPanY = 0;
 let currentpanx= 0
 let currentpany = 0;
-// Fetch all countries from REST Countries API
-async function loadCountriesData() {
-    try {
-        const response = await fetch('https://restcountries.com/v3.1/all');
-        if (!response.ok) throw new Error('Failed to fetch countries');
-        
-        const countries = await response.json();
-        countries.forEach(country => {
-            countrydata[country.cca2] = {
-                name: country.name.common,
-                flag: country.flags.png,
-                area: country.area ? (country.area.toLocaleString() + " km²") : "N/A",
-                capital: country.capital ? country.capital[0] : "N/A",
-                region: country.region,
-                population: country.population ? country.population.toLocaleString() : "N/A",
-                description: `${country.name.common} is located in ${country.region}.`
-            };
-        });
-        console.log("Countries data loaded successfully");
-    } catch (error) {
-        console.error("Error loading countries data:", error);
-    }
-}
 
-// Load countries data on page load
-document.addEventListener('DOMContentLoaded', loadCountriesData);
+if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        themeToggle.innerHTML = isDark ? '<strong>☀</strong>' : '<strong>⏾</strong>';
+        themeToggle.setAttribute('aria-pressed', String(isDark));
+    });
+}
 
 // Hover Effects
 countries.forEach(function(country) {
@@ -91,91 +90,81 @@ countries.forEach(function(country) {
     });
 
     // Click event
-    country.addEventListener("click", function (e) {
-        const countryName = this.getAttribute("name") || this.getAttribute("class");
-        const countryId = this.getAttribute("id");
-        
-        // Show loading state
+    country.addEventListener("click", async function () {
+        const countryName = this.getAttribute("name") || this.getAttribute("class") || "";
+        const countryId = this.getAttribute("id") || "";
+        const className = this.getAttribute("class") || "";
+        const normalizedName = (countryName || className)?.trim();
+        const lookupName = normalizedName === "Cyprus" || normalizedName === "cyprus" ? "Cyprus" : normalizedName;
+        let customData = customCountryData[countryId] || customCountryData[lookupName] || customCountryData[countryName] || customCountryData[className] || null;
+        console.log('clicked country', { countryName, countryId, className, lookupName, customData: customData?.name || null });
+
+        if (lookupName === "Cyprus" || countryId === "CY" || className === "Cyprus") {
+            customData = {
+                name: 'Cyprus',
+                flag: 'https://flagcdn.com/w320/cy.png',
+                achievements: [
+                    'B.Sc. in Mathematics and Computer Science',
+                    'High Honors and Honors in first two semesters',
+                    'Relocated internationally to pursue higher education.',
+                    'Built a strong foundation in programming through self-driven learning and projects.'
+                ],
+                timespent: '4 years'
+            };
+        } else if (countryId === "PS" || lookupName === "Palestine" || className === "Palestine") {
+            customData = customCountryData["PS"];
+        }
+
         if (instructionsDiv) instructionsDiv.classList.add("hide");
         if (countryInfoDiv) countryInfoDiv.classList.remove("hide");
-        if (loading) loading.classList.remove("hide");
         if (sidepanel) sidepanel.classList.add("active");
 
-        // Get custom data - try by ISO code first, then by name
-        const customData = customCountryData[countryId] || customCountryData[countryName];
+        if (countryname) countryname.innerText = customData?.name || countryName || countryId || "Country";
 
-        // Fetch from REST Countries API
-        fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
-            .then(function(response) {
-                if (!response.ok) return null;
-                return response.json();
-            })
-            .then(function(data) {
-                setTimeout(function() {
-                    const apiData = data ? data[0] : null;
+        let flagUrl = customData?.flag || "";
 
-                    // Name
-                    if (countryname) countryname.innerText = customData ? customData.name || countryName : (apiData ? apiData.name.common : countryName);
-                    
-                    // Area
-                    if (area) area.innerText = `Area: ${customData && customData.area ? customData.area : (apiData ? apiData.area.toLocaleString() + " km²" : "N/A")}`;
-                    
-                    // Capital
-                    if (capital) capital.innerText = `Capital: ${customData && customData.capital ? customData.capital : (apiData && apiData.capital ? apiData.capital[0] : "N/A")}`;
-                    
-                    // Region
-                    if (region) region.innerText = `Region: ${customData && customData.region ? customData.region : (apiData ? apiData.region : "N/A")}`;
-                    
-                    // Population
-                    if (population) population.innerText = `Population: ${customData && customData.population ? customData.population : (apiData ? apiData.population.toLocaleString() : "N/A")}`;
-                    
-                    // Description
-                    if (description) description.innerText = customData && customData.personalNotes ? customData.personalNotes : (apiData ? `${apiData.name.common} is located in ${apiData.region}.` : "N/A");
-                    
-                    // Flag - always use API
-                    if (flag) {
-                        const flagUrl = customData && customData.flag ? customData.flag : (apiData ? apiData.flags.png : "");
-                        if (flagUrl) {
-                            flag.src = flagUrl;
-                            flag.style.display = "block";
-                        }
-                    }
-                    
-                    // Achievements
-                    if (achievementsList) {
-                        achievementsList.innerHTML = "";
-                        if (customData && customData.achievements && Array.isArray(customData.achievements)) {
-                            customData.achievements.forEach(achievement => {
-                                const li = document.createElement('li');
-                                li.innerText = achievement;
-                                achievementsList.appendChild(li);
-                            });
-                        } else {
-                            achievementsList.innerHTML = "<li>No achievements data available.</li>";
-                        }
-                    }
-                    
-                    // Time Spent
-                    if (timeSpentSpan) {
-                        if (customData && customData.timespent) {
-                            timeSpentSpan.textContent = customData.timespent;
-                        } else {
-                            timeSpentSpan.textContent = "N/A";
-                        }
-                    }
+        if (!flagUrl && countryName) {
+            try {
+                const response = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}?fullText=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const apiCountry = Array.isArray(data) && data[0] ? data[0] : null;
+                    flagUrl = apiCountry?.flags?.png || "";
+                }
+            } catch (error) {
+                console.error("Flag fetch failed:", error);
+            }
+        }
 
-                    // Hide loading and show content
-                    if (loading) loading.classList.add("hide");
-                    if (container) container.classList.remove("hide");
-                    
-                    // Show close button
-                    if (closeBtn) closeBtn.classList.remove("hide");
-                }, 400);
-            })
-            .catch(function(error) {
-                console.error("Fetch Error:", error);
-                if (loading) loading.innerText = "Failed to load country details.";
-            });
+        if (flag) {
+            if (flagUrl) {
+                flag.src = flagUrl;
+                flag.style.display = "block";
+            } else {
+                flag.style.display = "none";
+            }
+        }
+
+        if (achievementsList) {
+            achievementsList.innerHTML = "";
+            if (customData?.achievements?.length) {
+                customData.achievements.forEach(function (achievement) {
+                    const li = document.createElement('li');
+                    li.innerText = achievement;
+                    achievementsList.appendChild(li);
+                });
+            } else {
+                achievementsList.innerHTML = "<li>No achievements data available.</li>";
+            }
+        }
+
+        if (timeSpentSpan) {
+            timeSpentSpan.textContent = customData?.timespent || "N/A";
+        }
+
+        if (loading) loading.classList.add("hide");
+        if (container) container.classList.remove("hide");
+        if (closeBtn) closeBtn.classList.remove("hide");
     });
 });
 
